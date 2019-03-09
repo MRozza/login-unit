@@ -1,7 +1,5 @@
 var Travis = require('travis-ci');
 
-var repo = 'https://github.com/MRozza/home-unit';
-
 var travis = new Travis({
   version: '2.0.0'
 });
@@ -9,31 +7,30 @@ var travis = new Travis({
 travis.authenticate(
   {
     // available through Travis CI Account - settings
-    github_token: 'Dukl6RIkyDQUMxG-nxSASg'
+    access_token: 'Dukl6RIkyDQUMxG-nxSASg'
   },
   function(err, res) {
     if (err) {
       return console.error(err);
     }
-
-    travis
-      .repos(repo.split('/')[0], repo.split('/')[1])
-      .builds.get(function(err, res) {
-        if (err) {
-          return console.error(err);
-        }
-
-        travis.requests.post(
-          {
-            build_id: res.builds[0].id
-          },
-          function(err, res) {
-            if (err) {
-              return console.error(err);
-            }
-            console.log(res.flash[0].notice);
-          }
-        );
-      });
+    console.log('auth res:' + JSON.stringify(res));
+    var request = require('request');
+    request.post(
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'Travis-API-Version': '3',
+          Authorization: 'token Dukl6RIkyDQUMxG-nxSASg'
+        },
+        url: 'https://api.travis-ci.org/repo/MRozza%2Fhome-unit/requests',
+        body: '{"request": {"branch":"master"}}'
+      },
+      function(error, response, body) {
+        if (error) console.error(error);
+        console.log('body: ' + body);
+        console.log('response: ' + JSON.stringify(response));
+      }
+    );
   }
 );
